@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 @Order(value = 2)
 public class TestOrder implements CommandLineRunner {
 
-    @Override
     public void run(String[] args) {
         System.out.println("order2");
     }
