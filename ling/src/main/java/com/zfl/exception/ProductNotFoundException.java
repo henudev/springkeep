@@ -1,4 +1,4 @@
-package com.zfl.ling.exception;
+package com.zfl.exception;
 
 /**
  * @ClassName ProductNotFoundException

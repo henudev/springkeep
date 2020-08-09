@@ -1,4 +1,7 @@
-package com.zfl.ling;
+package com.zfl;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @ClassName SyncTest
@@ -13,6 +16,7 @@ public class SyncTest2 {
         System.out.println("tag-a------------");
         Thread.sleep(4000);
         System.out.println("睡了四秒之后");
+        Map map = new HashMap();
     }
     
     public void test02() {
