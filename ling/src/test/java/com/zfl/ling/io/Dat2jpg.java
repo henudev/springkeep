@@ -1,6 +1,10 @@
 package com.zfl.ling.io;
 
 import java.io.File;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 /**
  * @ClassName Dat2jpg
  * @Description TODO
@@ -11,7 +15,7 @@ import java.io.File;
 
 public class Dat2jpg {
     public void change() {
-        File file = new File("C:\\Image\\2019-02");
+        File file = new File("C:\\Image");
         File[] files = file.listFiles();
         for (int i = 0; i < files.length; i++) {
             if(files[i].isDirectory()){
@@ -31,7 +35,7 @@ public class Dat2jpg {
         s.replace( "\\\\",   "\\\\\\\\");
         System.out.println("after####################" + s);
         try {
-            String ss = "python C:\\" + "\\Image\\" + "\\2019-02\\" + "\\chatImageDecoder.py " + s;
+            String ss = "python C:\\" + "\\Image\\" + "\\chatImageDecoder.py " + s;
             Process pr = Runtime.getRuntime().exec(ss);
             pr.waitFor();
             System.out.println("end");
@@ -43,6 +47,15 @@ public class Dat2jpg {
 
     
     public static void main (String[] args) {
+//        //多线程
+//        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(4, 8,5, TimeUnit.SECONDS, 
+//                new ArrayBlockingQueue<Runnable>(4), new ThreadPoolExecutor.DiscardOldestPolicy()); 
+//        for (int i = 0 ; i < 1000; i++) {
+//            String task = "task@ " + i;
+//            threadPool.execute(new Dat2jpg().change());            
+//        }
+//        
+//        
         Dat2jpg dat2jpg = new Dat2jpg();
         dat2jpg.change();
     }

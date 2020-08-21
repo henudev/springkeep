@@ -1,5 +1,7 @@
 package com.zfl.ling.exception;
 
+import com.zfl.ling.model.TestParam;
+
 /**
  * @ClassName ProductNotFoundException
  * @Description TODO

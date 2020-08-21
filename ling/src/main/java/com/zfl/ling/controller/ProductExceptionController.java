@@ -1,4 +1,4 @@
-package com.zfl.ling.exception;
+package com.zfl.ling.controller;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
