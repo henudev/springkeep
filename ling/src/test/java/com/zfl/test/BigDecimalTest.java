@@ -1,4 +1,7 @@
-package com.zfl.ling;
+package com.zfl.test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @ClassName SyncTest
@@ -8,19 +11,23 @@ package com.zfl.ling;
  * @Version 1.0
  **/
 
-public class SyncTest2 {
+public class BigDecimalTest {
     public synchronized void test01() throws InterruptedException {
+        int  i = 1_000_000;
+        int j = 1_000_000;
+        System.out.println(i + j);
         System.out.println("tag-a------------");
         Thread.sleep(4000);
         System.out.println("睡了四秒之后");
+        Map map = new HashMap();
     }
     
     public void test02() {
         System.out.println("excute test02 method");
     }
-    
+
     public static void main(String[] args) {
-        SyncTest2 syncTest1 = new SyncTest2();
+        BigDecimalTest syncTest1 = new BigDecimalTest();
         
         Thread thread1 = new Thread(() -> {
             try {
