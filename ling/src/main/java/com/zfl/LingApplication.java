@@ -7,8 +7,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-
-@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
+@SpringBootApplication
 public class LingApplication {
     public static void main(String[] args) {
         SpringApplication.run(LingApplication.class, args);
