@@ -1,4 +1,4 @@
-package com.zfl.ling;
+package com.zfl.other;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

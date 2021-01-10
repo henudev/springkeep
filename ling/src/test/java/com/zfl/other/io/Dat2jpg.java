@@ -1,9 +1,6 @@
-package com.zfl.ling.io;
+package com.zfl.other.io;
 
 import java.io.File;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @ClassName Dat2jpg

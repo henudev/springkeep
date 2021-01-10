@@ -1,7 +1,6 @@
-package com.zfl.ling.model;
+package com.zfl.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+
 
 /**
  * @ClassName TestParam
@@ -10,9 +9,24 @@ import lombok.Data;
  * @Date 2019/11/3 18:42
  * @Version 1.0
  **/
-@Data
-@AllArgsConstructor
+
 public class TestParam {
     private String name;
     private String id;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }

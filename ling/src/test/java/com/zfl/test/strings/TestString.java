@@ -1,6 +1,5 @@
-package com.zfl.ling.strings;
+package com.zfl.other.strings;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

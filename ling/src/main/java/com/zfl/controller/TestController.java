@@ -1,9 +1,7 @@
-package com.zfl.ling.controller;
+package com.zfl.controller;
 
-import com.zfl.ling.model.TestParam;
+import com.zfl.model.TestParam;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @ClassName Test
