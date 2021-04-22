@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
+
+<artifactId>tools</artifactId>
+<groupId>com.h3c.bigdata</groupId>
+<version>0.0.1-SNAPSHOT</version>
+<name>tools-db</name>
+<!-- FIXME change it to the project's website -->
+<url>http://www.example.com</url>
+
+<properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <mysql-connector-java.version>5.1.40</mysql-connector-java.version>
+    <mybatis-spring.version>1.3.1</mybatis-spring.version>
+    <mybatis.version>3.4.2</mybatis.version>
+    <tk.mybatis.mapper.version>3.4.0</tk.mybatis.mapper.version>
+</properties>
+<dependencies>
+    <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis-spring</artifactId>
+        <version>1.3.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis</artifactId>
+        <version>3.4.2</version>
+    </dependency>
+    <dependency>
+        <groupId>tk.mybatis</groupId>
+        <artifactId>mapper</artifactId>
+        <version>3.4.0</version>
+    </dependency>
+</dependencies>
+
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.mybatis.generator</groupId>
+            <artifactId>mybatis-generator-maven-plugin</artifactId>
+            <version>1.3.5</version>
+            <dependencies>
+                <!--数据库驱动 -->
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>${mysql-connector-java.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>tk.mybatis</groupId>
+                    <artifactId>mapper</artifactId>
+                    <version>${tk.mybatis.mapper.version}</version>
+                </dependency>
+            </dependencies>
+            <executions>
+                <execution>
+                    <id>Generate MyBatis Artifacts</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <!--允许移动生成的文件 -->
+                <verbose>true</verbose>
+                <skip>false</skip>
+                <!-- 是否覆盖 -->
+                <overwrite>true</overwrite>
+                <!-- 自动生成的配置 -->
+                <configurationFile>
+                    src\main\resources\scripts\mybatis-generator.xml
+                </configurationFile>
+            </configuration>
+        </plugin>
+    </plugins>
+
+</build>
+</project>
+

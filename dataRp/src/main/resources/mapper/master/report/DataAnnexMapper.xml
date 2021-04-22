@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.h3c.bigdata.zhgx.function.report.dao.DataAnnexMapper">
+  <resultMap id="BaseResultMap" type="com.h3c.bigdata.zhgx.function.report.entity.DataAnnexEntity">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="groupid" jdbcType="VARCHAR" property="groupId" />
+    <result column="old_name" jdbcType="VARCHAR" property="oldName" />
+    <result column="new_name" jdbcType="VARCHAR" property="newName" />
+    <result column="file_type" jdbcType="VARCHAR" property="fileType" />
+    <result column="file_size" jdbcType="VARCHAR" property="fileSize" />
+    <result column="file_path" jdbcType="VARCHAR" property="filePath" />
+    <result column="template_id" jdbcType="VARCHAR" property="templateId" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="import_date" jdbcType="TIMESTAMP" property="importDate" />
+  </resultMap>
+  <insert id="insert">
+    insert into data_annex (id, groupid,old_name,new_name,file_type,file_size,file_path,md5,url,template_id,user_id, import_date)
+    VALUES
+      (#{itemBean.id},#{itemBean.groupId},#{itemBean.oldName},#{itemBean.newName},
+      #{itemBean.fileType},#{itemBean.fileSize},#{itemBean.filePath},#{itemBean.md5},#{itemBean.url},#{itemBean.templateId},#{itemBean.userId},now())
+  </insert>
+
+
+  <delete id="deleteById">
+    delete from data_annex where id=#{id}
+  </delete>
+  <delete id="deleteByGroupId">
+    delete from data_annex where groupid=#{groupId}
+  </delete>
+
+  <select id="selectAnnexListByGroupId" resultType="com.h3c.bigdata.zhgx.function.report.entity.DataAnnexEntity">
+    select * from data_annex where groupid=#{groupId}
+  </select>
+  <select id="selectById" resultType="com.h3c.bigdata.zhgx.function.report.entity.DataAnnexEntity">
+    select * from data_annex where id=#{id}
+  </select>
+  <select id="selectIdsByGroupId" resultType="java.lang.String">
+    select id from data_annex where groupid=#{groupId}
+  </select>
+  <select id="test" resultType="java.util.Map">
+      select id from ${table} where
+  </select>
+  <select id="getOneDataById" resultType="java.util.Map">
+    select * from ${table} where id = #{dataId}
+  </select>
+  <select id="getAnnexListByIdList" resultType="com.h3c.bigdata.zhgx.function.report.entity.DataAnnexEntity">
+    select * from report_data.data_annex as d
+    where d.id in
+    <foreach item="item" collection="list" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    order by import_date desc
+  </select>
+  <select id="getAnnexFileIdList" resultType="java.lang.String">
+    select ${item} from ${table}
+  </select>
+  <select id="getExtraInfoByAnnexId" resultType="java.util.Map">
+    select ${jydate}, ${volume} from ${table}
+    where ${annexWord} like CONCAT('%',#{annexId},'%')
+  </select>
+  <update id="updateOneData">
+    update ${table} set ${key} = #{value} where id = #{dataId}
+  </update>
+
+</mapper>

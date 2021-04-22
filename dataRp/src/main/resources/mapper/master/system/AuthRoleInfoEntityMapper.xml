@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.h3c.bigdata.zhgx.function.system.dao.AuthRoleInfoEntityMapper">
+  <resultMap id="BaseResultMap" type="com.h3c.bigdata.zhgx.function.system.entity.AuthRoleInfoEntity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="role_code" jdbcType="VARCHAR" property="roleCode" />
+        <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+        <result column="status" jdbcType="CHAR" property="status" />
+        <result column="role_detail" jdbcType="VARCHAR" property="roleDetail" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="role_key" jdbcType="VARCHAR" property="roleKey" />
+        <result column="department_id" jdbcType="VARCHAR" property="departmentId" />
+        <result column="level" jdbcType="VARCHAR" property="roleLevel" />
+  </resultMap>
+
+    <select id="queryAuthRoleInfoEntityList" resultMap="BaseResultMap">
+        select id,role_code,role_name,status,role_detail,create_time,update_time
+        from auth_role_info
+       WHERE 1 = 1
+        <if test="roleName != null and roleName !=''">
+            and role_name like CONCAT('%', #{roleName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            and status=#{status}
+        </if>
+
+    </select>
+
+    <select id="queryAuthRoleListByUserId" resultMap="BaseResultMap">
+        select id,role_code,role_name,status,role_detail,create_time,update_time,role_key
+        from auth_role_info
+        where  id in (select role_id from auth_user_role where user_id = #{userId})
+
+    </select>
+
+    <select id="queryRoleInfoByName" resultMap="BaseResultMap">
+        select id,role_code,role_name,status,role_detail,create_time,update_time,role_key
+        from auth_role_info
+        where  role_name = #{roleName}
+
+    </select>
+
+    <delete id="deleteRolesById" parameterType="java.util.List">
+        delete from auth_role_info where id in
+        <foreach item="role" collection="list" open="(" separator="," close=")">
+            #{role.id}
+        </foreach>
+    </delete>
+
+    <!--
+      @Description: 依据roleKey查询角色列表
+      @Author: l17503
+      @Date: 2019/7/12 10:22
+    -->
+    <select id="queryByRoleKey" parameterType="String" resultMap="BaseResultMap">
+        select id,role_code,role_name,status,role_detail,create_time,update_time,role_key,department_id
+        from auth_role_info
+        where role_key = #{roleKey}
+    </select>
+    <!--
+      @Description: 依据roleKey查询角色实体
+      @Author: l17503
+      @Date: 2019/7/12 10:22
+    -->
+    <select id="queryRoleByRoleKey" parameterType="String" resultType="string">
+        select id
+        from auth_role_info
+        where role_key = #{roleKey}
+    </select>
+    <!--
+      @Description: 为流程节点查询角色列表
+      @Param:
+      @Author: l17503
+      @Date: 2020/1/17 10:42
+    -->
+    <select id="queryRoleForApprove" parameterType="String" resultMap="BaseResultMap">
+        select t2a.id,
+            t2a.role_code,
+            t2a.role_name,
+            t2a.role_detail,
+            t2a.status,
+            t2a.create_time,
+            t2a.update_time,
+            t2a.role_key,
+            t2a.department_id,
+            t2a.level
+        from `zhgx`.auth_role_info t2a
+        where t2a.id in(
+            select distinct(t1c.id) from `zhgx`.auth_user_info t1a
+            left join `zhgx`.auth_user_role t1b on t1a.user_id = t1b.user_id
+            left join `zhgx`.auth_role_info t1c on t1b.role_id = t1c.id
+            where t1a.department_id = #{departmentId}
+        )
+    </select>
+</mapper>

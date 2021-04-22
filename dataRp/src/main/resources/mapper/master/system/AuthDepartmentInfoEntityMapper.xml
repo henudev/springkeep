@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.h3c.bigdata.zhgx.function.system.dao.AuthDepartmentInfoEntityMapper">
+  <resultMap id="BaseResultMap" type="com.h3c.bigdata.zhgx.function.system.entity.AuthDepartmentInfoEntity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="department_name" jdbcType="VARCHAR" property="departmentName" />
+    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="department_code" jdbcType="VARCHAR" property="departmentCode" />
+    <result column="parent_department_code" jdbcType="VARCHAR" property="parentDepartmentCode" />
+    <result column="department_detail" jdbcType="VARCHAR" property="departmentDetail" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+    <resultMap id="queryBaseResultMap" type="com.h3c.bigdata.zhgx.function.system.model.DepartmentInfoResultBean">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="department_name" jdbcType="VARCHAR" property="departmentName" />
+        <result column="status" jdbcType="CHAR" property="status" />
+        <result column="department_code" jdbcType="VARCHAR" property="departmentCode" />
+        <result column="parent_department_code" jdbcType="VARCHAR" property="parentDepartmentCode" />
+        <result column="department_detail" jdbcType="VARCHAR" property="departmentDetail" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="parent_department_name" jdbcType="VARCHAR" property="parentDepartmentName" />
+    </resultMap>
+
+    <select id="queryMaxDptCodeByParentCode" resultMap="BaseResultMap">
+        select max(department_code) as department_code
+        from auth_department_info
+        where
+        parent_department_code = #{parentDepartmentCode}
+        group by parent_department_code
+    </select>
+
+    <!--<select id="queryDptByCode" resultMap="BaseResultMap">
+        select COUNT(*) as department_code
+        from auth_department_info
+        where
+        status = #{status}
+        and
+        id = #{id}
+    </select>-->
+    <select id="queryDptInfoEntityList" resultMap="queryBaseResultMap">
+
+        SELECT
+        a.id,
+        a.department_name,
+        a.`status`,
+        a.department_code,
+        a.parent_department_code,
+        a.department_detail,
+        a.update_time,
+        a.lng,
+        a.lat,
+        b.department_name parent_department_name
+        FROM
+        auth_department_info a
+        LEFT JOIN auth_department_info b ON a.parent_department_code = b.department_code
+        <where>
+         <if test="departmentName != null and departmentName != ''">
+            and a.department_name like CONCAT('%',#{departmentName},'%')
+         </if>
+         <if test="status != null and status != ''">
+            and a.status='0'
+         </if>
+         <if test="id != null and id != ''">
+            and a.id=#{id}
+         </if>
+
+        </where>
+    </select>
+
+    <select id="queryChildrenDptsByParentId" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+        b.id,
+        b.department_code,
+        b.parent_department_code,
+        b.department_name
+        FROM
+        auth_department_info a
+        RIGHT JOIN auth_department_info b ON a.department_code = b.parent_department_code
+        WHERE b.status = '0' and a.id in
+        <foreach item="dpt" collection="list" open="(" separator="," close=")">
+            #{dpt.id}
+        </foreach>
+    </select>
+
+   <!--删除、批量删除组织部门-->
+    <delete id="deleteDptsStatus">
+        delete from auth_department_info
+        WHERE
+        id
+        IN
+        <foreach collection ="list" item="dpt" open="(" separator="," close=")">
+            (#{dpt.id})
+        </foreach>
+    </delete>
+
+
+
+    <select id="selectDepartmentById" parameterType="String" resultMap="BaseResultMap">
+        SELECT department_name,department_code,parent_department_code FROM auth_department_info where id = #{id}
+    </select>
+
+     <!--查询登陆人员所在的部门信息-->
+    <select id="selectDeptByUserId" resultMap="BaseResultMap" >
+        select dept.* from auth_user_info sysUser LEFT JOIN auth_department_info dept
+        on sysUser.department_id = dept.id
+        where  sysUser.user_id = #{userId};
+    </select>
+
+    <!--
+      @Description: 依据departmentCode查询部门信息
+      @Author: l17503
+      @Date: 2019/7/22 16:26
+    -->
+    <select id="selectByDepartmentCode" resultMap="BaseResultMap">
+        select * from auth_department_info where department_code = #{departmentCode}
+    </select>
+
+    <!--获取子部门的id列表-->
+    <select id="selectDepartmentIdsByCode" resultType="java.lang.String">
+        select id from auth_department_info where  parent_department_code = #{departmentCode}
+    </select>
+
+    <select id="selectDepartmentCodesByCode" resultType="java.lang.String">
+        select  department_code  from auth_department_info where  parent_department_code = #{departmentCode}
+    </select>
+
+    <!--
+      @Description: 依据roleKey查询部门列表（主要用于查询roleKey=0）
+      @Param:
+      @Author: l17503
+      @Date: 2019/12/20 17:56
+    -->
+    <select id="selectByRoleKey" resultMap="BaseResultMap">
+        select t1a.id, t1a.department_name, t1a.status, t1a.department_code, t1a.parent_department_code, t1a.department_detail, t1a.create_time, t1a.lng, t1a.lat, t1a.update_time from auth_department_info t1a
+        where t1a.id in(
+            select t1m.department_id from auth_role_info t1m
+            where t1m.role_key = #{roleKey}
+        )
+    </select>
+</mapper>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.h3c.bigdata.zhgx.function.system.dao.AuthMenuInfoEntityMapper">
+  <resultMap id="BaseResultMap" type="com.h3c.bigdata.zhgx.function.system.entity.AuthMenuInfoEntity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="menu_code" jdbcType="VARCHAR" property="menuCode" />
+    <result column="parent_menu_code" jdbcType="VARCHAR" property="parentMenuCode" />
+    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="menu_type" jdbcType="CHAR" property="menuType" />
+    <result column="order_number" jdbcType="INTEGER" property="orderNumber" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="menu_name" jdbcType="VARCHAR" property="menuName" />
+    <result column="function_type" jdbcType="VARCHAR" property="functionType" />
+  </resultMap>
+
+    <resultMap id="ResultMap4Update" type="com.h3c.bigdata.zhgx.function.system.model.MenuButtonBean">
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="function_type" jdbcType="VARCHAR" property="buttonName" />
+    </resultMap>
+
+    <resultMap id="ResultLoginMenuBean" type="com.h3c.bigdata.zhgx.function.system.model.LoginMenuBean">
+        <result column="menu_code" jdbcType="VARCHAR" property="menuCode" />
+        <result column="function_type" jdbcType="VARCHAR" property="functionType" />
+    </resultMap>
+
+
+    <select id="queryMaxMenuCodeByParentCode" resultMap="BaseResultMap">
+        select max(menu_code) as menu_code
+        from auth_menu_info
+        where
+        parent_menu_code = #{parentMenuCode}
+        group by parent_menu_code
+    </select>
+
+    <select id="queryMenuInfoList" resultMap="BaseResultMap">
+        select id,menu_code,parent_menu_code,status,url,menu_type,order_number,create_user,
+        create_time,update_user,update_time,remark,menu_name,function_type
+        from auth_menu_info
+        where 1=1
+        <if test="menuName != null and menuName != ''">
+            and menu_name like CONCAT('%',#{menuName},'%')
+        </if>
+        <if test="status != null and status != ''">
+            and status=#{status}
+        </if>
+        <if test="menuType != null and menuType != ''">
+            and menu_type=#{menuType}
+        </if>
+        <if test="parentMenuCode != null and parentMenuCode != ''">
+            and parent_menu_code=#{parentMenuCode}
+        </if>
+    </select>
+
+
+    <delete id="deleteMenusByMenuIds" parameterType="java.util.List">
+        delete from auth_menu_info where id in
+        <foreach item="menu" collection="list" open="(" separator="," close=")">
+            #{menu.id}
+        </foreach>
+    </delete>
+    <delete id="deleteMenusByParentMenuId">
+        delete from auth_menu_info where parent_menu_code= #{parentMenuCode}
+    </delete>
+
+    <select id="queryChildrenMenusByParentId" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+            b.id,
+            b.menu_code,
+            b.parent_menu_code,
+            b.menu_name
+        FROM
+            auth_menu_info a
+        RIGHT JOIN auth_menu_info b ON a.menu_code = b.parent_menu_code
+        WHERE b.menu_type = '1' and a.id in
+        <foreach item="menu" collection="list" open="(" separator="," close=")">
+            #{menu.id}
+        </foreach>
+    </select>
+
+    <select id="queryMenuListByUserId" parameterType="string" resultMap="BaseResultMap">
+        SELECT
+            m.id,m.menu_code,m.parent_menu_code,m.status,m.url,m.menu_type,m.order_number,m.create_user,
+        m.create_time,m.update_user,m.update_time,m.remark,m.menu_name,GROUP_CONCAT(rm.function_type) function_type
+        FROM
+            auth_user_info u
+        INNER JOIN auth_user_role r ON u.user_id = r.user_id
+        INNER JOIN auth_role_menu rm ON r.role_id = rm.role_id
+        INNER JOIN auth_menu_info m ON rm.menu_id = m.id
+        where u.user_id = #{userId}
+        group by m.menu_code
+    </select>
+
+
+    <select id="queryRootMenu" resultMap="BaseResultMap">
+        select id,menu_code,parent_menu_code,status,url,menu_type,order_number,create_user,
+        create_time,update_user,update_time,remark,menu_name,function_type
+        from auth_menu_info
+        where id = '1'
+    </select>
+
+    <resultMap id="MenuTreeResultMap" type="com.h3c.bigdata.zhgx.function.system.entity.AuthMenuInfoEntity">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="menu_code" jdbcType="VARCHAR" property="menuCode" />
+        <result column="parent_menu_code" jdbcType="VARCHAR" property="parentMenuCode" />
+        <result column="status" jdbcType="CHAR" property="status" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="menu_type" jdbcType="CHAR" property="menuType" />
+        <result column="order_number" jdbcType="INTEGER" property="orderNumber" />
+        <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="menu_name" jdbcType="VARCHAR" property="menuName" />
+        <result column="function_type" jdbcType="VARCHAR" property="functionType" />
+        <collection property="childMenus" column="{parentMenuCode=menu_code}" javaType="ArrayList"
+              ofType="com.h3c.bigdata.zhgx.function.system.entity.AuthMenuInfoEntity"
+              select="com.h3c.bigdata.zhgx.function.system.dao.AuthMenuInfoEntityMapper.queryMenuTreeRecursion" />
+  </resultMap>
+
+    <select id="queryMenuTreeRecursion" resultMap="MenuTreeResultMap">
+        select id,menu_code,parent_menu_code,status,url,menu_type,order_number,create_user,
+        create_time,update_user,update_time,remark,menu_name,function_type
+        from auth_menu_info
+        where 1=1
+
+        <if test="parentMenuCode != null and parentMenuCode != ''">
+            and parent_menu_code=#{parentMenuCode}
+        </if>
+        and (menu_type = '1' or menu_type = '2')
+    </select>
+
+    <!--
+      查询根节点，以根节点为入口递归查询菜单树，生成自根节点向下的一棵树
+    -->
+    <select id="queryMenuTree" resultMap="MenuTreeResultMap">
+        select id,menu_code,parent_menu_code,status,url,menu_type,order_number,create_user,
+        create_time,update_user,update_time,remark,menu_name,function_type
+        from auth_menu_info
+        where
+
+            <if test="menuName != null and menuName != ''">
+                menu_name like CONCAT('%', #{menuName}, '%') and
+            </if>
+            (menu_type = '1' or menu_type = '2')
+
+    </select>
+
+    <!--获取父级菜单分类列表-->
+    <select id="getMenuCategoryList" resultMap="MenuTreeResultMap">
+        select id,menu_code,parent_menu_code,status,url,menu_type,order_number,create_user,
+        create_time,update_user,update_time,remark,menu_name,function_type
+        from auth_menu_info where menu_type = '1'
+    </select>
+
+
+    <select id="queryUrlByUserId" resultMap="BaseResultMap">
+        SELECT
+            t2.id,t2.menu_code,t2.parent_menu_code,t2.status,t2.url,t2.menu_type,t2.order_number,t2.create_user,
+            t2.create_time,t2.update_user,t2.update_time,t2.remark,t2.menu_name,t2.function_type
+        FROM
+            (
+                SELECT
+                    m.id,
+                    m.menu_code,
+                    m.parent_menu_code,
+                    m.url,
+                    m.menu_type,
+                    m.menu_name,
+                    GROUP_CONCAT(rm.function_type) function_type
+                FROM
+                    auth_user_info u
+                    INNER JOIN auth_user_role r ON u.user_id = r.user_id
+                    INNER JOIN auth_role_menu rm ON r.role_id = rm.role_id
+                    INNER JOIN auth_menu_info m ON rm.menu_id = m.id
+                WHERE
+                    u.user_id = #{userId}
+                    AND rm.function_type IS NOT NULL
+                GROUP BY
+                    m.menu_code
+            ) t1,
+            auth_menu_info t2
+        WHERE
+            t2.parent_menu_code = t1.menu_code
+            AND FIND_IN_SET(
+                    t2.function_type,
+                    t1.function_type
+            )
+        union
+        select t3.* from auth_menu_info t3
+        where t3.menu_type = '3'
+    </select>
+
+    <select id="deleteMenuByParentMenuAndType" resultMap="BaseResultMap">
+        DELETE
+        FROM
+            auth_menu_info
+        WHERE
+            parent_menu_code = #{menuCode}
+            AND menu_type = '3'
+    </select>
+
+    <select id="queryMenuButtonByMenuCode" resultMap="BaseResultMap">
+        SELECT
+           t2.id,t2.menu_code,t2.parent_menu_code,t2.status,t2.url,t2.menu_type,t2.order_number,t2.create_user,
+            t2.create_time,t2.update_user,t2.update_time,t2.remark,t2.menu_name,t2.function_type
+        FROM
+            auth_menu_info t2
+        WHERE
+            t2.parent_menu_code = #{menuCode}
+            AND t2.menu_type = '3';
+    </select>
+
+
+    <select id="queryLoginMenuByUserId" resultMap="ResultLoginMenuBean">
+                   SELECT
+                ami.menu_code,
+                a.function_type
+            FROM
+                auth_menu_info ami,
+                (
+                    SELECT
+                        *
+                    FROM
+                        auth_role_menu
+                    WHERE
+                        role_id IN (
+                            SELECT
+                                role_id
+                            FROM
+                                auth_user_role
+                            WHERE
+                                user_id = #{userId}
+                        )
+                ) a,auth_role_info ari
+            WHERE
+                a.menu_id = ami.id
+						AND ari.id = a.role_id
+            AND ami.menu_type = '1'
+			AND ari.`status` = '0'
+    </select>
+
+    <select id="queryLoginMenuByAdmin" resultMap="ResultLoginMenuBean">
+                    SELECT
+                menu_code,
+                function_type
+            FROM
+                auth_menu_info
+            WHERE
+              menu_type = '1'
+    </select>
+
+    <!--
+        查询根节点，以根节点为入口递归查询菜单树，生成自根节点向下的一棵树
+      -->
+    <select id="queryMenuListByRoleId" resultMap="MenuTreeResultMap">
+        select a.id,a.menu_code,parent_menu_code,status,url,menu_type,order_number,create_user,
+        create_time,update_user,update_time,remark,menu_name,a.function_type
+        from auth_menu_info a
+        left join  auth_role_menu b ON a.id= b.menu_id
+        where
+        (a.menu_type = '1' or a.menu_type = '2') and  b.role_id =#{roleId}
+
+    </select>
+    <!--获取菜单及子菜单列表-->
+    <select id="queryMeunAndChilden"
+            resultMap="BaseResultMap">
+        SELECT id from auth_menu_info a
+        WHERE a.id = #{id} or a.parent_menu_code = #{menuCode}
+    </select>
+
+</mapper>

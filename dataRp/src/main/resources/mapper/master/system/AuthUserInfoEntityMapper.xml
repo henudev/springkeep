@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.h3c.bigdata.zhgx.function.system.dao.AuthUserInfoEntityMapper">
+  <resultMap id="BaseResultMap" type="com.h3c.bigdata.zhgx.function.system.entity.AuthUserInfoEntity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="user_name_pinyin" jdbcType="VARCHAR" property="userNamePinyin" />
+    <result column="department_id" jdbcType="VARCHAR" property="departmentId" />
+    <result column="phone_number" jdbcType="VARCHAR" property="phoneNumber" />
+    <result column="email_address" jdbcType="VARCHAR" property="emailAddress" />
+    <result column="age" jdbcType="VARCHAR" property="age" />
+    <result column="identity_number" jdbcType="VARCHAR" property="identityNumber" />
+    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="sex" jdbcType="CHAR" property="sex" />
+    <result column="avatar" jdbcType="BLOB" property="avatar" />
+    <result column="caller_name" jdbcType="VARCHAR" property="callerName" />
+  </resultMap>
+
+    <select id="selectMaxUserIdByUserNamePinyin" resultMap="BaseResultMap">
+        SELECT
+        MAX(a.user_id)
+        FROM
+        auth_user_info a
+        WHERE
+        a.user_name_pinyin=#{userNamePinyin}
+        group by a.user_name_pinyin
+    </select>
+
+    <update id="updateUsersStatus" parameterType="com.h3c.bigdata.zhgx.function.system.model.UsersStatusBean">
+        UPDATE auth_user_info
+        SET status =#{status}
+        WHERE
+        user_id
+	    IN
+        <foreach collection ="users" item="user" open="(" separator="," close=")">
+            (#{user.userId})
+        </foreach>
+    </update>
+
+    <update id="forbidUsersInfo">
+        UPDATE auth_user_info
+        SET status =#{user.status}
+        WHERE
+        user_id = #{user.userId}
+    </update>
+    <!--根据id更新是否首次登陆标志位-->
+    <update id="updateUserById">
+        UPDATE auth_user_info
+        SET first_login_flag ='1'
+        WHERE
+        id=#{id}
+    </update>
+
+    <select id="selectUserByDptId" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+        a.id,
+        a.user_id,
+        a.user_name,
+        a.department_id
+        FROM
+        auth_user_info a
+        WHERE
+        a.status = '0'
+        and
+        a.department_id in
+        <foreach item="dpt" collection="list" open="(" separator="," close=")">
+            #{dpt.id}
+        </foreach>
+    </select>
+
+
+    <select id="selectUserBy" resultMap="BaseResultMap">
+SELECT
+	aui.*
+FROM
+	auth_user_info aui
+LEFT JOIN auth_user_role aur ON aui.user_id = aur.user_id
+LEFT JOIN auth_role_info ari ON ari.id = aur.role_id
+WHERE
+	aui.department_id = #{deptRoleBean.deptId} AND aui.status='0'
+AND ari.role_key = #{deptRoleBean.roleKey}
+    </select>
+
+    <select id="selectUserByRoleIdAndDepId" resultMap="userDepartmentResultMap">
+SELECT
+	aui.*
+FROM
+	auth_user_info aui
+LEFT JOIN auth_user_role aur ON aui.user_id = aur.user_id
+WHERE
+	aui.department_id = #{deptRoleBean.deptId} AND aui.status='0'
+AND aur.role_id = #{deptRoleBean.roleKey}
+    </select>
+
+    <resultMap id="userDepartmentResultMap" type="com.h3c.bigdata.zhgx.function.system.entity.AuthUserDeptEntity">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="user_name_pinyin" jdbcType="VARCHAR" property="userNamePinyin" />
+        <result column="department_id" jdbcType="VARCHAR" property="departmentId" />
+        <result column="phone_number" jdbcType="VARCHAR" property="phoneNumber" />
+        <result column="email_address" jdbcType="VARCHAR" property="emailAddress" />
+        <result column="age" jdbcType="VARCHAR" property="age" />
+        <result column="identity_number" jdbcType="VARCHAR" property="identityNumber" />
+        <result column="status" jdbcType="CHAR" property="status" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="sex" jdbcType="CHAR" property="sex" />
+        <association property="departmentInfo"
+                     column="department_id"
+                     javaType="com.h3c.bigdata.zhgx.function.system.entity.AuthDepartmentInfoEntity"
+                     select="com.h3c.bigdata.zhgx.function.system.dao.AuthDepartmentInfoEntityMapper.selectDepartmentById">
+            <!--<id property="id" column="id"></id>-->
+        </association>
+    </resultMap>
+
+
+    <resultMap id="InsertShowBeanMap" type="com.h3c.bigdata.zhgx.function.system.model.InsertShowBean">
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="department_Id" jdbcType="VARCHAR" property="departId" />
+        <result column="department_name" jdbcType="VARCHAR" property="departmentName" />
+    </resultMap>
+
+    <select id="selectUsersByRoleId" parameterType="String" resultMap="userDepartmentResultMap">
+        select u.* from auth_user_role ur, auth_user_info u where role_id = #{value } and ur.user_id = u.user_id
+    </select>
+
+    <select id="selectDeptByUserId" parameterType="String" resultMap="InsertShowBeanMap">
+       select aui.department_id,aui.user_name FROM auth_user_info aui
+       where aui.user_id = #{userId}
+    </select>
+
+    <select id="selectUserByUserId" resultMap="BaseResultMap">
+        select * from auth_user_info where user_id = #{userId}
+    </select>
+    <!--查询某用户所在部门的所有人员-->
+    <select id="getUsersByDepartmentId"
+            resultMap="BaseResultMap">
+       select aui.department_id,aui.user_name,aui.user_id FROM auth_user_info aui
+       where aui.department_id = #{departmentId}
+    </select>
+    <select id="selectUserModelByUserId"
+            resultType="com.h3c.bigdata.zhgx.function.system.model.UserWithRoleModel">
+        SELECT a.user_id userId, a.user_name userName,a.department_id departmentId ,b.department_name departmentName
+        FROM auth_user_info  a , auth_department_info b
+        WHERE a.department_id = b.id  AND a.user_id=#{userId}
+    </select>
+
+    <!--批量删除该用户相关的表对应的记录-->
+    <delete id="deleteUsersByUserId">
+        delete from auth_user_info
+        WHERE
+        user_id
+        IN
+        <foreach collection ="users" item="user" open="(" separator="," close=")">
+            (#{user.userId})
+        </foreach>
+    </delete>
+
+    <!--将删除的用户信息存入用户历史表-->
+    <insert id="batchInsertUserInfo" parameterType="java.util.List">
+        INSERT INTO auth_user_history ( id , user_id , user_name , user_name_pinyin ,
+        department_id , phone_number , email_address , age , identity_number ,
+        create_time , update_time , sex , avatar, caller_name )
+        VALUES
+        <foreach collection="list" item="user"  separator="," >
+            (#{user.id},#{user.userId},#{user.userName},
+            #{user.userNamePinyin},#{user.departmentId},#{user.phoneNumber},
+            #{user.emailAddress},#{user.age},#{user.identityNumber},
+            #{user.createTime},#{user.updateTime},#{user.sex},
+            #{user.avatar},#{user.callerName})
+        </foreach>
+    </insert>
+
+    <select id="getCallerNameList" resultType="java.lang.String">
+      SELECT
+       t2.dict_label AS callName
+      FROM
+       auth_user_info t1
+      LEFT JOIN sys_dict_data t2 ON t2.dict_value = t1.caller_name
+      WHERE
+	   t1.STATUS = '0'
+	  AND dict_type = 'CALLER_NAME' ORDER BY t2.dict_sort asc
+    </select>
+
+    <select id="selectUserIdsByDeptList" resultType="java.lang.String">
+        select user_id from auth_user_info where department_id in
+        <foreach collection="ids" item="department_id" open="(" close=")" separator=",">
+            #{department_id}
+        </foreach>
+    </select>
+
+    <!--
+      @Description: 查询用户级别
+      @Param:
+      @Author: l17503
+      @Date: 2020/1/22 13:59
+    -->
+    <select id="selectUserLevelByUserId" resultType="java.lang.String">
+        select ifnull(min(t2a.user_level), '4') from (
+            select case when t1r.level is null then '4' when t1r.level = '' then '4' else t1r.level end as user_level
+            from `zhgx`.auth_user_role t1ur
+            left join `zhgx`.auth_role_info t1r on t1ur.role_id = t1r.id
+            where t1ur.user_id = #{userId}
+        ) t2a
+    </select>
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.h3c.bigdata.zhgx.function.system.dao.AuthRoleMenuEntityMapper">
+  <resultMap id="BaseResultMap" type="com.h3c.bigdata.zhgx.function.system.entity.AuthRoleMenuEntity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="role_id" jdbcType="VARCHAR" property="roleId" />
+    <result column="menu_id" jdbcType="VARCHAR" property="menuId" />
+      <result column="function_type" jdbcType="VARCHAR" property="functionType" />
+  </resultMap>
+
+    <insert id="batchInsertRoleMenu" parameterType="java.util.List" >
+        INSERT INTO auth_role_menu (id,role_id,menu_id,function_type)
+        VALUES
+        <foreach collection ="list" item="roleMenu" separator =",">
+            (#{roleMenu.id},#{roleMenu.roleId},#{roleMenu.menuId},#{roleMenu.functionType})
+        </foreach>
+    </insert>
+
+    <delete id="deleteRoleMenuByRoleIds" parameterType="java.util.List">
+        delete from auth_role_menu where role_id in
+        <foreach item="role" collection="list" open="(" separator="," close=")">
+            #{role.id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRoleMenuByMenuIds" parameterType="java.util.List">
+        delete from auth_role_menu where menu_id in
+        <foreach item="menu" collection="list" open="(" separator="," close=")">
+            #{menu.id}
+        </foreach>
+    </delete>
+
+    <update id="updateFunctionByRoleIdAndMenuId">
+        update auth_role_menu
+
+        set function_type= #{update.functionType}
+
+        where role_id = #{update.roleId} and menu_id = #{update.menuId}
+
+    </update>
+
+</mapper>

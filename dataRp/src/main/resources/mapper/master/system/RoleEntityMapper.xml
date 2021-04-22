@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.h3c.bigdata.zhgx.function.system.dao.RoleEntityMapper">
+  <resultMap id="BaseResultMap" type="com.h3c.bigdata.zhgx.function.system.entity.RoleEntity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="role_code" jdbcType="VARCHAR" property="roleCode" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+    <result column="is_default" jdbcType="VARCHAR" property="isDefault" />
+    <result column="role_type" jdbcType="VARCHAR" property="roleType" />
+    <result column="industry_limit" jdbcType="VARCHAR" property="industryLimit" />
+    <result column="area_limit" jdbcType="VARCHAR" property="areaLimit" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="update_staff_id" jdbcType="VARCHAR" property="updateStaffId" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="reserve_str1" jdbcType="VARCHAR" property="reserveStr1" />
+    <result column="reserve_str2" jdbcType="VARCHAR" property="reserveStr2" />
+    <result column="reserve_str3" jdbcType="VARCHAR" property="reserveStr3" />
+  </resultMap>
+</mapper>
